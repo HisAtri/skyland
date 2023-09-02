@@ -10,7 +10,7 @@ cred_list = []
 vName = '1.0.1'
 vCode = '100001014'
 UA = f"Skland/{vName} (com.hypergryph.skland; build:{vCode}; Android 29; ) Okhttp/4.11.0"
-with open("cred_list.txt", 'r+') as file:
+with open("cred_list.txt", 'a+') as file:
     for line in file:
         line = line.strip()
         cred_list.append(line)
@@ -73,18 +73,19 @@ def get_next_timestamp(timeh, next_day=False):
 
 
 def timing_task(start, end, next_day=False):
-    end_timestamp = get_next_timestamp(end)
+    end_timestamp = get_next_timestamp(end, next_day)
     start_timestamp = end_timestamp - (end - start) * 3600
-    time_range_start = random.randint(start_timestamp, end_timestamp - 10, next_day)
+    time_range_start = random.randint(start_timestamp, end_timestamp - 10)
     return time_range_start
 
 
 def start_task(start, end):
     next_start = timing_task(start, end)
-
+    logger.info(f"定时任务将在{start}:00-{end}:00时间段内随机执行")
     while True:
         now_time = datetime.datetime.now().timestamp()
         if next_start < now_time < next_start + 10:
+            logger.info("定时任务开始执行")
             for single_cred in cred_list:
                 signin(single_cred)
             next_start = timing_task(start, end, True)
